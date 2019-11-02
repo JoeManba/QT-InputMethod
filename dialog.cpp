@@ -1,0 +1,52 @@
+#include "dialog.h"
+#include <QDesktopWidget>
+#define WINDOW_HEIGHT QApplication::desktop()->availableGeometry().height()//QApplication::desktop()->screenGeometry().height()
+
+
+Dialog::Dialog(QWidget *parent)
+    : QDialog(parent)
+{
+    QLabel *label = new QLabel(this);
+    label->setText("输入法测试");
+
+    lineEdit = new QLineEdit(this);
+
+    lineEdit->installEventFilter(this);
+    keyboard = new SoftKeyboard(this->lineEdit);
+
+    QHBoxLayout *hboxLyaout = new QHBoxLayout(this);
+    hboxLyaout->addWidget(label);
+    hboxLyaout->addWidget(lineEdit);
+}
+
+bool Dialog::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == lineEdit)
+    {
+        if(event->type() == QEvent::FocusIn)
+        {
+            showKeyboard();
+            lineEdit->clearFocus();//防止inputEdit重新获得焦点再一次激发事件
+        }
+        else if(event->type() == QEvent::FocusOut)
+        {
+
+        }
+    }
+
+
+    return QWidget::eventFilter(watched, event);
+}
+
+void Dialog::showKeyboard()
+{
+    QString temStr;
+    keyboard->show();
+
+    keyboard->move(keyboard->x(), WINDOW_HEIGHT - keyboard->height());
+}
+
+Dialog::~Dialog()
+{
+
+}
